@@ -1,0 +1,59 @@
+#include <LiquidCrystal.h>
+
+int seconds = 0;
+int ledPin = 13;  // Pin del LED
+int motorPin = 10;  // Pin del ventilador (motor)
+LiquidCrystal lcd_1(12, 11, 5, 4, 3, 2);
+const int sensorPin = 13; // Pin analógico donde está conectado el sensor TMP36
+
+void setup() {
+  Serial.begin(9600);
+  lcd_1.begin(16, 2); // Set up the number of columns and rows on the LCD.
+  lcd_1.print("Temperatura= ");
+  pinMode(ledPin, OUTPUT); // Configurar el pin del LED como salida
+  pinMode(motorPin, OUTPUT); // Configurar el pin del ventilador (motor) como salida
+}
+
+void loop() {
+  // Set the cursor to column 0, line 1 (second row)
+  lcd_1.setCursor(0, 1);
+  
+  // Read the raw ADC value from the TMP36 sensor
+  int sensorValue = analogRead(sensorPin);
+  
+  // Convert the ADC value to voltage
+  float voltage = sensorValue * (5.0 / 1023.0);
+  
+  // Convert the voltage to temperature in degrees Celsius
+  float temperatureC = (voltage - 0.5) * 100.0;
+  
+  // Print the temperature to the LCD
+  lcd_1.print("Temp: ");
+  lcd_1.print(temperatureC);
+  lcd_1.print(" C");
+  
+
+  // Apagar el LED y el ventilador (motor) por defecto
+  digitalWrite(ledPin, LOW);
+  digitalWrite(motorPin, LOW);
+	
+  // Validaciones de temperatura
+  if (temperatureC <= 10) {
+    // Si la temperatura es menor o igual a 10°C, el LED parpadea y el ventilador está apagado
+    digitalWrite(ledPin, HIGH); // Encender el LED
+    delay(500); // Esperar 0.5 segundos
+    digitalWrite(ledPin, LOW); // Apagar el LED
+    delay(500); // Esperar 0.5 segundos
+  } else if (temperatureC >= 26) {
+    // Si la temperatura es mayor o igual a 26°C, el LED está encendido y el ventilador (motor) está encendido
+    digitalWrite(ledPin, HIGH); // Encender el LED
+    digitalWrite(motorPin, HIGH); // Encender el ventilador (motor)
+ 
+  }
+  
+  // Incrementar el contador de segundos
+  seconds += 1;
+  
+  // Esperar 1 segundo antes de la siguiente lectura de temperatura
+  delay(1000);
+}

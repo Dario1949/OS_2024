@@ -1,0 +1,47 @@
+const int LED_RED = 13;
+const int pinVentilador = 12; 
+
+void setup() {
+  
+  Serial.begin(9600);
+
+  
+  pinMode(LED_RED, OUTPUT);
+  pinMode(pinVentilador, OUTPUT);
+}
+
+void loop() {
+  
+  int temperatura = obtenerTemperatura();
+
+  // Mostrar la temperatura por el puerto serial
+  Serial.print("Temperatura: ");
+  Serial.print(temperatura);
+  Serial.println(" °C");
+
+  // Validación 1: Temperatura < 5 °C
+  if (temperatura < 5) {
+    // Accionar el LED en intermitencia con retardo de 0.5 segundos
+    digitalWrite(LED_RED, HIGH);
+    delay(500);
+    digitalWrite(LED_RED, LOW);
+    delay(500);
+  }
+  // Validación 2: Temperatura entre 6 °C y 25 °C
+  else if (temperatura >= 6 && temperatura <= 25) {
+    // Apagar el LED
+    digitalWrite(LED_RED, LOW);
+  }
+  // Validación 3: Temperatura > 25 °C
+  else {
+    // Encender el LED y el ventilador
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(pinVentilador, HIGH);
+  }
+}
+
+
+int obtenerTemperatura() {
+  
+  return random(0, 41);
+}

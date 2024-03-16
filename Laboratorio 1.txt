@@ -1,0 +1,109 @@
+// Pines a los que están conectadas las luces
+const int LED_GREEN = 11;
+const int LED_RED = 12;
+const int LED_YELLOW = 13;
+
+// Variable para controlar el modo intermitente
+bool modoIntermitente = false;
+
+void setup() {
+  // Inicialización del puerto serial
+  Serial.begin(9600);
+  
+  // Configuración de los pines de las luces como salida
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+}
+
+void loop() {
+  // Si hay datos disponibles para leer desde el puerto serial
+  if (Serial.available() > 0) {
+    // Lee el primer byte entrante
+    char comando = Serial.read();
+    
+    // Control de los comandos recibidos
+    switch(comando) {
+      case '1':
+        encenderLuz(LED_GREEN, "verde");
+        break;
+      case '2':
+        apagarLuz(LED_GREEN, "verde");
+        break;
+      case '3':
+        encenderLuz(LED_RED, "rojo");
+        break;
+      case '4':
+        apagarLuz(LED_RED, "rojo");
+        break;
+      case '5':
+        encenderLuz(LED_YELLOW, "amarillo");
+        break;
+      case '6':
+        apagarLuz(LED_YELLOW, "amarillo");
+        break;
+      case '7':
+        encenderTodasLasLuces();
+        break;
+      case '8':
+        apagarTodasLasLuces();
+        break;
+      case '9':
+        modoIntermitente = !modoIntermitente; // Cambiar el estado del modo intermitente
+        if (modoIntermitente) {
+          intermitente();
+          Serial.println("Modo intermitente activado.");
+        } else {
+          apagarTodasLasLuces(); // Si se desactiva el modo intermitente, apagar todas las luces
+          Serial.println("Modo intermitente desactivado.");
+        }
+        break;
+      default:
+        // Mensaje de comando inválido
+        Serial.println("Comando inválido. Por favor, ingrese 1 para encender el led verde, 2 para apagarlo, 3 para encender el led rojo, 4 para apagarlo, 5 para encender rl led amarillo, 6 para apagarlo, 7 para encender todos los led, 8 para apagarlos o 9 para activar/desactivar el modo intermitente.");
+        break;
+    }
+  }
+}
+
+// Función para encender una luz específica
+void encenderLuz(int pin, String color) {
+  digitalWrite(pin, HIGH); // Enciende la luz
+  Serial.println("Led " + color + " encendido.");
+}
+
+// Función para apagar una luz específica
+void apagarLuz(int pin, String color) {
+  digitalWrite(pin, LOW); // Apaga la luz
+  Serial.println("Led " + color + " apagado.");
+}
+
+// Función para encender todas las luces
+void encenderTodasLasLuces() {
+  digitalWrite(LED_GREEN, HIGH);
+  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_YELLOW, HIGH);
+  Serial.println("Todos los led encendidos.");
+}
+
+// Función para apagar todas las luces
+void apagarTodasLasLuces() {
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_RED, LOW);
+  digitalWrite(LED_YELLOW, LOW);
+  Serial.println("Todos los led apagados.");
+}
+
+// Función para el modo intermitente
+void intermitente() {
+  while (modoIntermitente) {
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_YELLOW, HIGH);
+    delay(300); // Espera medio segundo
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    delay(300); // Espera medio segundo
+  }
+}
